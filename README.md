@@ -1,0 +1,1 @@
+This is my submission for the F1 Race Strategy challenge with Mercedes. It is a UI-based program that takes real-time track conditions and uses historical and real time data to give an estimated lifespan of the current racer's tyres. It uses OpenF1 API.
