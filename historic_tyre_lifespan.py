@@ -5,21 +5,22 @@ import datetime
 
 
 class Main:
-    def __init__(self, trackSels, win):
+    def __init__(self, trackSels, prefs, win):
         self.__win = win
         self.__bgCol = "#D7D7D7"
         self.__winMenu = tk.Menu(self.__win)
         self.__win.config(menu=self.__winMenu)
-        self.__winMenu.add_command(label="Prefs")
+        self.__winMenu.add_command(label="Prefs", command=self.__showPrefs)
         self.__winMenu.add_command(label="Help")
 
-        # todo: add a previous menu where you select what you will do ?
+        # to do: add a previous menu where you select what you will do ?
         # -- might not be necessary? mayb instead a help icon in a menu bar at top !!
         # -- not included in class/ mainframe
-        # todo: add in comments to explain all this
-        # todo: instead of anything fancy, just say "NO DATA" if no keys in list : )
-        # todo: make it look nice - little image an everything
-        # todo: add the help and preferences windows : )
+        # add in comments to explain all this
+        # instead of anything fancy, just say "NO DATA" if no keys in list : )
+        # make it look nice - little image an everything
+        # add the help window : )
+        self.__prefs = {"air temp": 5, "track temp": 5}
         self.__selections = {}
         self.__compoundKeys = []
         self.__airTempKeys = []
@@ -159,12 +160,49 @@ class Main:
                 if len(set) > 0:
                     pass
 
+    def __showPrefs(self):
+        prefWindow = Preferences()
+        self.__prefs = prefWindow.getPrefs()
+
+
+class Preferences:
+    def __init__(self):
+        ## add commenting in here
+        self.__prefs = {"air temp": 5, "track temp": 5}
+        self.__screen = tk.Tk()
+        self.__screen.title("Parameter Prefs")
+
+        self.__airTempPrefLabel = tk.Label(self.__screen, text="Air Temp Preference: ")
+        self.__airTempPrefField = tk.Entry(self.__screen)
+
+        self.__airTempPrefLabel.pack()
+        self.__airTempPrefField.pack()
+
+        self.__trackTempPrefLabel = tk.Label(self.__screen, text="Track Temp Preference: ")
+        self.__trackTempPrefField = tk.Entry(self.__screen)
+
+        self.__trackTempPrefLabel.pack()
+        self.__trackTempPrefField.pack()
+
+        self.__prefSubmit = tk.Button(self.__screen, text="Set Prefs", command=self.__setPrefs)
+
+        self.__prefSubmit.pack()
+
+        self.__screen.mainloop()
+
+    def __setPrefs(self):
+        self.__prefs["air temp"] = self.__airTempPrefField.get()
+        self.__prefs["track temp"] = self.__trackTempPrefField.get()
+        print(self.__prefs)
+
+    def getPrefs(self):
+        return self.__prefs
+
 
 year = ((datetime.datetime.now()).date()).strftime("%Y")
 trackSelectionsURL = urlopen(f'https://api.openf1.org/v1/sessions?year={year}')
 trackSelectionJSON = json.loads(trackSelectionsURL.read().decode('utf-8'))
 trackSelections = ["Any"]
-
 for session in trackSelectionJSON:
     if session["circuit_short_name"] not in trackSelections:
         trackSelections.append(session["circuit_short_name"])
@@ -180,5 +218,5 @@ backgroundImage = tk.PhotoImage(file="IMAGES/F1_BG.png")
 backgroundLabel = tk.Label(window, image=backgroundImage)
 backgroundLabel.place(x=0, y=0, relwidth=1, relheight=1)
 
-main = Main(trackSelections, window)
+main = Main(trackSelections, "",  window)
 window.mainloop()
